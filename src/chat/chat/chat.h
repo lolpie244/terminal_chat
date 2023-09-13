@@ -1,9 +1,10 @@
 #pragma once
 
+#include "networking/communication_socket.h"
 #include <string>
 #include <list>
 #include <memory>
-#include "user.h"
+// #include <sys/socket.h>
 
 namespace chat {
 	using std::string;
@@ -13,12 +14,12 @@ namespace chat {
 	private:
 		string password;
 		string name;
-		std::list<User> user_list;
+		std::list<tcp_socket::CommunicationSocket> sockets;
+		// std::list<tcp_socket::CommunicationSocket> user_list;
 	public:
 		Chat(string name, string password);
 
-		bool check_access(string password);
-		void add_user(std::shared_ptr<User> user);
-		void new_message(string message);
+		void add_user(tcp_socket::CommunicationSocket& socket, string password);
+		void new_message(const tcp_socket::CommunicationSocket& socket, const string& message);
 	};
 }

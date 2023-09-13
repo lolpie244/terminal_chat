@@ -4,6 +4,7 @@
 #include <memory>
 #include <netdb.h>
 #include <string>
+#include <vector>
 #include "communication_socket.h"
 
 namespace tcp_socket
@@ -16,6 +17,8 @@ class ConnectionSocket
 	int socket_fd;
 	addrinfo *address;
 	bool is_binded = false;
+
+	std::vector<std::thread> threads;
 public:
 	ConnectionSocket(const char *host, const char *port, const addrinfo &address);
 	ConnectionSocket(const char *port);

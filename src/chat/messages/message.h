@@ -1,0 +1,7 @@
+namespace message 
+{
+	class Message
+	{
+
+	}
+}
