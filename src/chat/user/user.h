@@ -8,6 +8,7 @@ namespace chat {
 	class User {
 	private:
 		string username;
+		string username_color;
 	public:
 		User(string username);
 	};

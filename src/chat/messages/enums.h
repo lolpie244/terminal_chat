@@ -1,7 +1,8 @@
 enum EventType {
 	CONNECT,
 	DISSCONNECT,
-	SEND
+	SEND_MESSAGE,
+	SEND_COMMAND,
 };
 
 enum InfoType {
