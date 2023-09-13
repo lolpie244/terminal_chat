@@ -21,13 +21,13 @@ private:
 public:
 	CommunicationSocket(int socket_fd, sockaddr_storage address, bool is_server);
 
-	void send(const char* message);
-	void send(const std::stringstream& message);
-	void send(const string& message);
+	void send(const char* message) const;
+	void send(const std::stringstream& message) const;
+	void send(const string& message) const;
 
-	void on_recieve(std::function<void(char* message, sockaddr_storage address)> callback_function, bool always);
-	void on_recieve(std::function<void(std::stringstream& message, sockaddr_storage address)> callback_function, bool always);
-	void on_recieve(std::function<void(std::string& message, sockaddr_storage address)> callback_function, bool always);
+	void on_recieve(std::function<void(char* message, const CommunicationSocket& socket)> callback_function, bool always);
+	void on_recieve(std::function<void(std::stringstream& message, const CommunicationSocket& socket)> callback_function, bool always);
+	void on_recieve(std::function<void(std::string& message, const CommunicationSocket& socket)> callback_function, bool always);
 
 	~CommunicationSocket();
 };
