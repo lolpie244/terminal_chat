@@ -13,10 +13,8 @@ void func(char* message, const tcp_socket::CommunicationSocket& socket) {
 }
 int main()
 {
-	addrinfo hints;
-	memset(&hints, 0, sizeof hints);
-	hints.ai_family = AF_INET;
-	hints.ai_socktype = SOCK_STREAM;
+	addrinfo hints = tcp_socket::ConnectionSocket::get_default_addrinfo();
+	hints.ai_family = AF_INET6;
 	hints.ai_flags = AI_PASSIVE;
 
 	tcp_socket::ConnectionSocket socket(nullptr, "2346", hints);

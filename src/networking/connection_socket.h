@@ -24,6 +24,8 @@ public:
 	CommunicationSocket connect();
 	void listen(std::function<void(CommunicationSocket communication_socket)> after_accept, int queue_size=20);
 
+	static addrinfo get_default_addrinfo();
+
 	~ConnectionSocket();
 
 };
