@@ -1,14 +1,10 @@
 cmake_minimum_required(VERSION 3.21)
-project(app)
+project(terminal_chat)
 
 set(CMAKE_CXX_STANDARD 20)
 
+set(LIB_NAME chat-lib)
+set(APP_NAME chat)
 
-add_library(file_searcher STATIC lib/file_searcher.cpp)
-add_executable(app app/main.cpp)
-
-target_include_directories(file_searcher PUBLIC lib)
-
-target_link_libraries(app PRIVATE file_searcher)
-
-
+add_subdirectory(src)
+add_subdirectory(app)
