@@ -54,35 +54,38 @@ void CommunicationSocket::send(const string &message) const
 {
 	send(message.c_str());
 }
-std::vector<std::thread> recieve_threads;
-void CommunicationSocket::on_recieve(
+
+bool CommunicationSocket::on_recieve(
     std::function<void(char *message, const CommunicationSocket& socket)> callback_function)
 {
 	// TODO: set proper size
 	char *buffer = new char[1024];
 	int size = 1024;
 	int recieve_size =::recv(socket_fd, buffer, size, 0); 
-	if(recieve_size == -1) {
+	std::cout << "RECIEVE" << ' ' << recieve_size << '\n';
+
+	if(recieve_size <= 0) {
 		delete[] buffer;
-		return;
+		return false;
 	}
 
 	// recieve_threads.emplace_back(callback_function, buffer, *this);
 	callback_function(buffer, *this);
+	return true;
 }
 
-void CommunicationSocket::on_recieve(std::function<void(stringstream &message, const CommunicationSocket& address)> callback_function)
+bool CommunicationSocket::on_recieve(std::function<void(stringstream &message, const CommunicationSocket& address)> callback_function)
 {
-	on_recieve(
+	return on_recieve(
 	[callback_function](char *buffer, const CommunicationSocket& socket) {
 		stringstream message(buffer);
 		callback_function(message, socket);
 	});
 }
 
-void CommunicationSocket::on_recieve(std::function<void(string &message, const CommunicationSocket& address)> callback_function)
+bool CommunicationSocket::on_recieve(std::function<void(string &message, const CommunicationSocket& address)> callback_function)
 {
-	on_recieve(
+	return on_recieve(
 	[callback_function](char *buffer, const CommunicationSocket& socket) {
 		string message(buffer);
 		callback_function(message, socket);

@@ -33,9 +33,9 @@ public:
 	void send(std::stringstream& message) const;
 	void send(const string& message) const;
 
-	void on_recieve(std::function<void(char* message, const CommunicationSocket& socket)> callback_function);
-	void on_recieve(std::function<void(std::stringstream& message, const CommunicationSocket& socket)> callback_function);
-	void on_recieve(std::function<void(std::string& message, const CommunicationSocket& socket)> callback_function);
+	bool on_recieve(std::function<void(char* message, const CommunicationSocket& socket)> callback_function);
+	bool on_recieve(std::function<void(std::stringstream& message, const CommunicationSocket& socket)> callback_function);
+	bool on_recieve(std::function<void(std::string& message, const CommunicationSocket& socket)> callback_function);
 
 	~CommunicationSocket();
 };

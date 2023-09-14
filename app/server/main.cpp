@@ -36,11 +36,13 @@ int main()
 	tcp_socket::ConnectionSocket socket(config::PORT);
 	chat::Chat current_chat("test", "1234");
 	socket.listen([&current_chat](tcp_socket::CommunicationSocket socket) {
-		while (true)
-			socket.on_recieve(
+		bool recieve_successful;
+		do {
+			recieve_successful = socket.on_recieve(
 				[&current_chat](std::stringstream &message, tcp_socket::CommunicationSocket socket) {
 					recieve_message(message, socket, current_chat);
 				}
 			);
+		} while(recieve_successful);
 	});
 }

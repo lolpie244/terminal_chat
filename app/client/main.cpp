@@ -100,12 +100,14 @@ int main()
 	read_thread = std::thread(
 	                  [](tcp_socket::CommunicationSocket socket,
 	const user::User &current_user) {
-		while (true)
-			socket.on_recieve(
-			    [&current_user](std::stringstream &message,
-			tcp_socket::CommunicationSocket socket) {
-			read_message(message, socket, current_user);
-		});
+		bool recieve_successful;
+		do {
+			recieve_successful = socket.on_recieve(
+				[&current_user](std::stringstream &message,
+				tcp_socket::CommunicationSocket socket) {
+				read_message(message, socket, current_user);
+			});
+		} while (recieve_successful);
 	},
 	new_socket, std::cref(current_user));
 
