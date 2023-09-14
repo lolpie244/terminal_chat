@@ -66,7 +66,7 @@ void ConnectionSocket::listen(
 			break;
 		}
 		// TODO: use threads
-		threads.emplace_back(after_accept, CommunicationSocket(new_socket_fd, client_address, true));
+		threads.emplace_back(after_accept, std::move(CommunicationSocket(new_socket_fd, client_address, true)));
 	}
 }
 

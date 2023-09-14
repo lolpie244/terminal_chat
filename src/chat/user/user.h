@@ -14,6 +14,7 @@ private:
 
 public:
 	User(string username);
+	string current_text;
 
 
 friend std::ostream& operator<<(std::ostream& os, const User& user);

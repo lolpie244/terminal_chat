@@ -27,6 +27,8 @@ public:
 
 	bool operator==(const CommunicationSocket& other_socket);
 
+	void close_connection() const;
+
 	void send(const char* message) const;
 	void send(std::stringstream& message) const;
 	void send(const string& message) const;

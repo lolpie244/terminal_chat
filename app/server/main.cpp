@@ -7,9 +7,10 @@
 #include "networking/communication_socket.h"
 #include "networking/connection_socket.h"
 #include "utils/events.h"
+#include "utils/config.h"
 
 void recieve_message(std::stringstream &message,
-                     tcp_socket::CommunicationSocket socket,
+                     tcp_socket::CommunicationSocket& socket,
                      chat::Chat &current_chat)
 {
 	int event;
@@ -32,7 +33,7 @@ void recieve_message(std::stringstream &message,
 
 int main()
 {
-	tcp_socket::ConnectionSocket socket("2348");
+	tcp_socket::ConnectionSocket socket(config::PORT);
 	chat::Chat current_chat("test", "1234");
 	socket.listen([&current_chat](tcp_socket::CommunicationSocket socket) {
 		while (true)

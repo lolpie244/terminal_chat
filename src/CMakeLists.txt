@@ -8,6 +8,7 @@ set(SOURCES
 
 	utils/config.h
 	utils/events.h
+	utils/terminal.h
 )
 
 add_library(${LIB_NAME} ${SOURCES})

@@ -19,7 +19,7 @@ namespace chat {
 	public:
 		Chat(string name, string password);
 
-		void add_user(tcp_socket::CommunicationSocket& socket, string password);
+		void add_user(const tcp_socket::CommunicationSocket& socket, string password);
 		void new_message(const tcp_socket::CommunicationSocket& socket, const string& message);
 	};
 }

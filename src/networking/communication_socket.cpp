@@ -26,6 +26,10 @@ bool CommunicationSocket::operator==(const CommunicationSocket& other_socket)
 	return socket_fd == other_socket.socket_fd;
 }
 
+void CommunicationSocket::close_connection() const
+{
+	::close(socket_fd);
+}
 
 void CommunicationSocket::send(const char *message) const
 {

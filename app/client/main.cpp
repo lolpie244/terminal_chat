@@ -4,6 +4,7 @@
 #include "utils/events.h"
 #include <cstdio>
 #include <cstring>
+#include <ctime>
 #include <iostream>
 
 #include <ndbm.h>
@@ -14,6 +15,50 @@
 #include <string>
 #include <sys/socket.h>
 #include <thread>
+#include <unistd.h>
+
+#include "utils/terminal.h"
+#include "utils/config.h"
+
+void write_message(tcp_socket::CommunicationSocket socket,
+                   user::User &current_user)
+{
+	terminal::BufferToggle bt;
+
+	bt.off();
+	while (true) {
+		char c;
+		do {
+			c = std::getchar();
+			current_user.current_text += c;
+		} while (c != '\n');
+
+		std::stringstream s;
+		s << current_user << " > " << current_user.current_text;
+		current_user.current_text = "";
+
+		std::cout << terminal::LINE_UP << terminal::BEGIN << s.str() << std::flush;
+		socket.send(events::add_event_prefix(s.str(), events::SERVER_NEW_MESSAGE));
+	}
+	bt.on();
+}
+
+void read_message(std::stringstream &message,
+                  tcp_socket::CommunicationSocket socket,
+                  const user::User &current_user)
+{
+	int event;
+	message >> event;
+	message.ignore();
+	if (event == events::CLIENT_NEW_MESSAGE) {
+		std::string text;
+		getline(message, text, '\0');
+		if (current_user.current_text.length() != 0)
+			std::cout << terminal::CLEAR_LINE << terminal::BEGIN << std::flush;
+
+		std::cout << text << current_user.current_text << std::flush;
+	}
+}
 
 int main()
 {
@@ -23,7 +68,7 @@ int main()
 	hints.ai_family = AF_INET6;
 	hints.ai_flags = AI_PASSIVE;
 
-	tcp_socket::ConnectionSocket socket(nullptr, "2348", hints);
+	tcp_socket::ConnectionSocket socket(nullptr, config::PORT, hints);
 
 	std::cout << "Connection to server in progress\n";
 	auto new_socket = socket.connect();
@@ -53,37 +98,19 @@ int main()
 	std::thread read_thread, write_thread;
 
 	read_thread = std::thread(
-	[](tcp_socket::CommunicationSocket socket) {
+	                  [](tcp_socket::CommunicationSocket socket,
+	const user::User &current_user) {
 		while (true)
 			socket.on_recieve(
-			[](std::stringstream &message, tcp_socket::CommunicationSocket socket) {
-				int event;
-				message >> event;
-				message.ignore();
-				if(event == events::CLIENT_NEW_MESSAGE)
-				{
-					std::string text;
-					getline(message, text, '\0');
-					std::cout << text << std::endl;
-				}
-			});
+			    [&current_user](std::stringstream &message,
+			tcp_socket::CommunicationSocket socket) {
+			read_message(message, socket, current_user);
+		});
 	},
-	new_socket);
+	new_socket, std::cref(current_user));
 
 	getchar();
-	write_thread = std::thread(
-	[](tcp_socket::CommunicationSocket socket, user::User current_user) {
-		std::string message;
-		while (true) {
-			std::getline(std::cin, message);
-			std::stringstream s;
-			s << current_user << " > " << message;
-			std::cout << "\x1b[A\r" << s.str() << std::endl;
-			socket.send(
-			    events::add_event_prefix(s.str(), events::SERVER_NEW_MESSAGE));
-		}
-	},
-	new_socket, current_user);
+	write_thread = std::thread(write_message, new_socket, std::ref(current_user));
 
 	read_thread.join();
 	write_thread.join();

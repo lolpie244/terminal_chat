@@ -7,7 +7,7 @@
 namespace chat {
 	Chat::Chat(string name, string password): name(name), password(password){}
 
-	void Chat::add_user(tcp_socket::CommunicationSocket& client_socket, string password)
+	void Chat::add_user(const tcp_socket::CommunicationSocket& client_socket, string password)
 	{
 		if (password != this->password)
 		{
