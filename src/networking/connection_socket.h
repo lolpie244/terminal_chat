@@ -14,7 +14,7 @@ using std::string;
 class ConnectionSocket
 {
 	private:
-	int socket_fd;
+	FileDescriptor socket_fd;
 	addrinfo *address;
 	bool is_binded = false;
 

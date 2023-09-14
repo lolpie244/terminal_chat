@@ -8,6 +8,7 @@
 #include <thread>
 #include <vector>
 #include "communication_socket.h"
+#include "file_descriptor.h"
 
 namespace tcp_socket
 {
@@ -16,14 +17,14 @@ using std::string;
 class CommunicationSocket
 {
 private:
-	int socket_fd;
+	FileDescriptor socket_fd;
 	sockaddr_storage address;
 	bool is_server;
 
 	// std::vector<std::thread> recieve_threads;
 
 public:
-	CommunicationSocket(int socket_fd, sockaddr_storage address, bool is_server);
+	CommunicationSocket(FileDescriptor socket_fd, sockaddr_storage address, bool is_server);
 
 	bool operator==(const CommunicationSocket& other_socket);
 
