@@ -16,12 +16,12 @@ public:
 	User(string username);
 	string current_text;
 
+	static User create_from_input();
+
 
 friend std::ostream& operator<<(std::ostream& os, const User& user);
-// friend std::istream& operator>>(std::istream& is, User& user);
 };
 
 std::ostream& operator<<(std::ostream& os, const User& user);
-// std::istream& operator>>(std::istream& is, User& user);
 
 } // namespace user

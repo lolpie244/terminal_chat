@@ -10,6 +10,7 @@
 #include <ndbm.h>
 #include <netdb.h>
 #include <ostream>
+#include <pthread.h>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -20,11 +21,45 @@
 #include "utils/terminal.h"
 #include "utils/config.h"
 
+tcp_socket::CommunicationSocket connect_to_host()
+{
+	addrinfo hints = tcp_socket::ConnectionSocket::get_default_addrinfo();
+	hints.ai_family = config::INET_FAMILY;
+	hints.ai_flags = AI_PASSIVE;
+
+	tcp_socket::ConnectionSocket socket(nullptr, config::PORT, hints);
+	return socket.connect();
+}
+
+bool connect_to_chat(tcp_socket::CommunicationSocket socket)
+{
+	std::string chat_name, password;
+
+	std::cout << "Connection established.\nChat name: ";
+	std::cin >> chat_name;
+	std::cout << "\nPassword: ";
+	std::cin >> password;
+
+	socket.send(
+	    events::add_event_prefix(password, events::SERVER_CONNECTION_ATTEMPT));
+
+	socket.on_recieve(
+	[](std::string &result, tcp_socket::CommunicationSocket socket) {
+		if (std::stoi(result) != events::CLIENT_CONNECTED) {
+			std::cout << ("Incorrect chat name or password");
+			exit(0);
+		}
+	});
+
+	return true;
+}
+
 void write_message(tcp_socket::CommunicationSocket socket,
                    user::User &current_user)
 {
 	terminal::BufferToggle bt;
 
+	getchar();
 	bt.off();
 	while (true) {
 		char c;
@@ -62,38 +97,10 @@ void read_message(std::stringstream &message,
 
 int main()
 {
-	int flag = 1;
+	tcp_socket::CommunicationSocket new_socket = connect_to_host();
+	connect_to_chat(new_socket);
 
-	addrinfo hints = tcp_socket::ConnectionSocket::get_default_addrinfo();
-	hints.ai_family = AF_INET6;
-	hints.ai_flags = AI_PASSIVE;
-
-	tcp_socket::ConnectionSocket socket(nullptr, config::PORT, hints);
-
-	std::cout << "Connection to server in progress\n";
-	auto new_socket = socket.connect();
-
-	std::string username, chat_name, password;
-
-	std::cout << "Connection established.\nChat name: ";
-	std::cin >> chat_name;
-	std::cout << "\nPassword: ";
-	std::cin >> password;
-
-	new_socket.send(
-	    events::add_event_prefix(password, events::SERVER_CONNECTION_ATTEMPT));
-
-	new_socket.on_recieve(
-	[](std::string &result, tcp_socket::CommunicationSocket socket) {
-		if (std::stoi(result) != events::CLIENT_CONNECTED) {
-			std::cout << ("Incorrect chat name or password");
-			exit(0);
-		}
-	});
-
-	std::cout << "\nUsername: ";
-	std::cin >> username;
-	user::User current_user(username);
+	auto current_user = user::User::create_from_input();
 
 	std::thread read_thread, write_thread;
 
@@ -111,7 +118,6 @@ int main()
 	},
 	new_socket, std::cref(current_user));
 
-	getchar();
 	write_thread = std::thread(write_message, new_socket, std::ref(current_user));
 
 	read_thread.join();

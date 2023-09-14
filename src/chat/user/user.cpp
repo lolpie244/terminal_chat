@@ -13,5 +13,15 @@ namespace user
 		os << user.username_color << user.username << default_color;
 		return os;
 	}
+
+	User User::create_from_input()
+	{
+		std::string username;
+		std::cout << "\nUsername: ";
+		std::cin >> username;
+		return user::User(username);
+
+	}
+
 	// std::istream& operator>>(std::istream& is, User& user);
 } // namespace user

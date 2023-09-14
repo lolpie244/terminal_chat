@@ -11,6 +11,7 @@
 #include <thread>
 #include <vector>
 
+#include "utils/config.h"
 #include "communication_socket.h"
 
 namespace tcp_socket
@@ -35,7 +36,7 @@ void CommunicationSocket::send(const char *message) const
 {
 	// TODO: set proper size
 	int send_size;
-	send_size = ::send(socket_fd, message, 1024, 0);
+	send_size = ::send(socket_fd, message, config::PACKAGE_SIZE, 0);
 	if (send_size == -1){
 		std::cout << "Send error: " << strerror(errno);
 		return;
@@ -59,10 +60,8 @@ bool CommunicationSocket::on_recieve(
     std::function<void(char *message, const CommunicationSocket& socket)> callback_function)
 {
 	// TODO: set proper size
-	char *buffer = new char[1024];
-	int size = 1024;
-	int recieve_size =::recv(socket_fd, buffer, size, 0); 
-	std::cout << "RECIEVE" << ' ' << recieve_size << '\n';
+	char *buffer = new char[config::PACKAGE_SIZE];
+	int recieve_size =::recv(socket_fd, buffer, config::PACKAGE_SIZE, 0);
 
 	if(recieve_size <= 0) {
 		delete[] buffer;

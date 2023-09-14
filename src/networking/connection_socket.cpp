@@ -10,6 +10,7 @@
 #include <sys/socket.h>
 
 #include "connection_socket.h"
+#include "utils/config.h"
 
 namespace tcp_socket
 {
@@ -25,8 +26,7 @@ ConnectionSocket::ConnectionSocket(const char *host, const char *port,
 ConnectionSocket::ConnectionSocket(const char *port)
 {
 	addrinfo hints = ConnectionSocket::get_default_addrinfo();
-	// TODO: move to config
-	hints.ai_family = AF_INET6;
+	hints.ai_family = config::INET_FAMILY;
 	hints.ai_flags = AI_PASSIVE;
 
 	int status = getaddrinfo(NULL, port, &hints, &address);
@@ -80,7 +80,7 @@ addrinfo ConnectionSocket::get_default_addrinfo()
 
 ConnectionSocket::~ConnectionSocket()
 {
-	close(socket_fd);
+	// close(socket_fd);
 	freeaddrinfo(address);
 }
 } // namespace tcp_socket
